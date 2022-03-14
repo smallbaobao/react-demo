@@ -1,0 +1,20 @@
+.page-reg {
+    height: 100vh;
+    background: url("../../images/bg.jpeg") no-repeat center;
+}
+
+.page-reg .register-form {
+    width: 38%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 48px 0 24px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.captcha-box {
+    cursor: pointer;
+    height: 32px;
+}
