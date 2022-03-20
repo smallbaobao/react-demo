@@ -1,1 +1,29 @@
 @import '~antd/dist/antd.css';
+
+/* 字体 */
+.font-24 {
+    font-size: 24px;
+}
+
+/* 鼠标形状 */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-initial {
+    cursor: initial;
+}
+
+/* margin */
+.m-l-24 {
+    margin-left: 24px;
+}
+
+.m-t-24 {
+    margin-top: 24px;
+}
+
+/* 宽高 */
+.w-288 {
+    width: 288px;
+}
