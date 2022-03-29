@@ -7,3 +7,8 @@ interface IRegReq {
 interface IRegResp extends IBaseResp {
   user: IRegReq;
 }
+
+interface ICaptchaResp extends IBaseResp {
+  /** svg验证码 */
+  captcha: string;
+}

@@ -24,7 +24,7 @@ export async function request<R extends IBaseResp = any>(
 
     const { data = {}, status, statusText } = resp || {};
 
-    if (status === 200 && statusText === "OK") {
+    if (status === 200 && statusText === "OK" && data?.success) {
       data.message && message.success(data.message);
 
       log({

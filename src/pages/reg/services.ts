@@ -3,7 +3,7 @@ import { request } from "../../utils/request";
 
 export async function fetchCaptchaService() {
   return box(
-    request({
+    request<ICaptchaResp>({
       url: "/captcha",
       method: "get",
     })
@@ -17,7 +17,7 @@ export async function fetchCaptchaService() {
  */
 export async function regService(data: IRegReq) {
   return box(
-    request<IBaseResp>({
+    request<IRegResp>({
       url: "/reg",
       method: "post",
       data,

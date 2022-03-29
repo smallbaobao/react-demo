@@ -7,7 +7,7 @@ import { log } from "../../utils/log";
 import "./index.css";
 
 const Reg: FC = () => {
-  const [captcha, setCaptcha] = useState("");
+  const [captcha, setCaptcha] = useState<any>("");
 
   const navigate = useNavigate();
 
@@ -36,10 +36,17 @@ const Reg: FC = () => {
     const [error, resp] = await fetchCaptchaService();
 
     if (error) {
+      log({
+        type: "error",
+        api: "fetchCaptcha",
+        message: "fetchCaptcha failed",
+        error,
+      });
+
       return;
     }
 
-    setCaptcha(resp);
+    setCaptcha(resp?.captcha);
   };
 
   useEffect(() => {
