@@ -3,12 +3,21 @@ import { Button, Col, Form, Input, Modal, Popconfirm, Row, Tree } from "antd";
 
 import ResultComponent from "../../components/result";
 import { fetchMenus } from "./models";
-import { deleteMenuService } from "./services";
+import {
+  createMenuService,
+  deleteMenuService,
+  updateMenuService,
+} from "./services";
+import { log } from "../../utils/log";
 
 const MenuManage: FC = () => {
   const [visible, setVisible] = useState(false);
   const [treeData, setTreeData] = useState<any[]>([]);
   const [show, setShow] = useState(false);
+  const [modalData, setModalData] = useState({
+    onFinish: async (values: any) => {},
+    btnText: "",
+  });
 
   const [form] = Form.useForm();
 
@@ -61,29 +70,92 @@ const MenuManage: FC = () => {
   }, []);
 
   /**
-   * 显示/关闭弹窗
+   * 显示弹窗
    */
   const showModal = () => {
-    setVisible(!visible);
+    setVisible(true);
   };
 
   /**
-   * TODO:
-   * 新增
+   * 关闭弹窗并重置表单
    */
-  const onAddClick = (values: any) => {
-    showModal();
-
-    console.log("form>>>>>>>>>", values);
+  const onCancel = () => {
+    setVisible(false);
 
     form.resetFields();
   };
 
   /**
-   * TODO:
-   * 编辑
+   * 新增
    */
-  const onEditClick = () => {};
+  const onAddClick = async (tree: ITree) => {
+    showModal();
+
+    setModalData({
+      onFinish: (values) => createMenu(values, tree),
+      btnText: "新增",
+    });
+  };
+
+  /**
+   * 新增请求
+   */
+  const createMenu = async (values: any, tree: ITree) => {
+    const [error, resp] = await createMenuService({
+      ...values,
+      parentId: tree.id,
+    });
+
+    if (error) {
+      log({
+        type: "error",
+        api: "createMenuService",
+        message: "createMenuService failed",
+        error,
+      });
+
+      return;
+    }
+
+    onCancel();
+
+    initData();
+  };
+
+  /**
+   * 点击编辑按钮， 显示弹窗并赋值form事件
+   */
+  const onEditClick = (tree: ITree) => {
+    showModal();
+    form.setFieldsValue({ ...tree });
+
+    setModalData({
+      onFinish: (values) => updateMenu(values, tree),
+      btnText: "编辑",
+    });
+  };
+
+  /**
+   * 编辑请求
+   */
+  const updateMenu = async (values: any, tree: ITree) => {
+    const [error, resp] = await updateMenuService({ id: tree.id, ...values });
+
+    if (error) {
+      log({
+        type: "error",
+        api: "updateMenuService",
+        message: "updateMenuService failed",
+        error,
+      });
+
+      return;
+    }
+
+    onCancel();
+
+    initData();
+  };
 
   /**
    * 删除菜单
@@ -99,48 +171,38 @@ const MenuManage: FC = () => {
     initData();
   };
 
-  // @ts-ignore
-  // const deleteMenu = useCallback((id) => {
-  //     console.log('treeData>>>>>>>>', treeData);
-
-  //     // @ts-ignore
-  //     treeData.forEach((tree, index) => {
-  //         // @ts-ignore
-  //         if (tree.id === id) {
-  //             treeData.splice(index, 1);
-
-  //             return;
-  //         }
-  //         // @ts-ignore
-  //         if (tree.children) {
-  //             // @ts-ignore
-  //             deleteMenu(tree.children, id);
-  //         }
-  //     });
-
-  //     setTreeData(treeData);
-  // }, [treeData]);
-
   const titleNode = (tree: ITree) => {
     return (
       <Row className="w-288 cursor-initial" justify="space-between">
         <Col flex="128px">{tree.name}</Col>
-        <Col onClick={showModal} className="cursor-pointer" flex="28px">
+        <Col
+          onClick={() => onAddClick(tree)}
+          className="cursor-pointer"
+          flex="28px"
+        >
           新增
         </Col>
-        <Col onClick={showModal} className="cursor-pointer" flex="28px">
-          编辑
-        </Col>
-        <Col className="cursor-pointer" flex="28px">
-          <Popconfirm
-            title="确认删除？"
-            okText="确认"
-            cancelText="取消"
-            onConfirm={() => onDelClick(tree.id)}
-          >
-            删除
-          </Popconfirm>
-        </Col>
+        {tree.key !== "all" && (
+          <>
+            <Col
+              onClick={() => onEditClick(tree)}
+              className="cursor-pointer"
+              flex="28px"
+            >
+              编辑
+            </Col>
+            <Col className="cursor-pointer" flex="28px">
+              <Popconfirm
+                title="确认删除？"
+                okText="确认"
+                cancelText="取消"
+                onConfirm={() => onDelClick(tree.id)}
+              >
+                删除
+              </Popconfirm>
+            </Col>
+          </>
+        )}
       </Row>
     );
   };
@@ -159,20 +221,13 @@ const MenuManage: FC = () => {
         onLeftBtnClick={() => initData()}
       />
 
-      <Modal
-        visible={visible}
-        okText="新增"
-        cancelText="取消"
-        onOk={onAddClick}
-        onCancel={() => setVisible(!visible)}
-        footer={null}
-      >
+      <Modal visible={visible} onCancel={onCancel} footer={null}>
         <Form
           form={form}
           {...formItemLayout}
           name="register"
           className="register-form"
-          onFinish={onAddClick}
+          onFinish={modalData.onFinish}
         >
           <Form.Item
             name="name"
@@ -196,7 +251,7 @@ const MenuManage: FC = () => {
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit">
-              新增
+              {modalData.btnText}
             </Button>
           </Form.Item>
         </Form>

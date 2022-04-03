@@ -20,7 +20,6 @@ export async function fetchMenus() {
   const treeData: ITree[] = [
     {
       id: 0,
-      parentId: 0,
       name: "全部菜单",
       path: "全部菜单",
       key: "all",
@@ -30,31 +29,28 @@ export async function fetchMenus() {
   const parentMenus: ITree[] = [];
   const childMenus: ITree[] = [];
 
-  menus.forEach((menu: any) => {
+  menus.forEach((menu: ITree) => {
     menu.children = [];
     menu.key = menu.path;
 
     if (!menu.parentId) {
       parentMenus.push(menu);
     } else {
-      if (parentMenus.length) {
-        parentMenus.forEach((parentMenu) => {
-          if (parentMenu.id === menu.parentId) {
-            parentMenus.push(menu);
-          } else {
-            childMenus.push(menu);
-          }
-        });
+      const index = parentMenus.findIndex(
+        (parentMenu: ITree) => parentMenu.id === menu.parentId
+      );
+      if (index >= 0) {
+        parentMenus[index].children?.push(menu);
       } else {
         childMenus.push(menu);
       }
     }
   });
 
-  childMenus.forEach((childMenu) => {
-    menus.forEach((menu: any) => {
+  childMenus.forEach((childMenu: ITree) => {
+    menus.forEach((menu: ITree) => {
       if (childMenu.parentId === menu.id) {
-        menu.children.push(childMenu);
+        menu.children?.push(childMenu);
       }
     });
   });

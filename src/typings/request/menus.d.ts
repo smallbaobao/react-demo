@@ -3,8 +3,10 @@ interface IMenusResp extends IBaseResp {
 }
 
 interface IMenuReq {
-  /** 菜单id */
+  /** 当前菜单id */
   id?: number;
+  /** 当前菜单id，新增子菜单传 */
+  parentId?: number;
   /** 菜单名称 */
   name?: string;
   /** 菜单路径 */
@@ -24,9 +26,15 @@ interface IDeleteMenuResp extends IBaseResp {
   id: string;
 }
 
-interface IMenu extends IMenuReq {
-  /** 菜单父级id */
-  parentId: number;
+interface IMenu {
+  /** 菜单id */
+  id?: number;
+  /** 父级id */
+  parentId?: number;
+  /** 菜单名称 */
+  name?: string;
+  /** 菜单路径 */
+  path?: string;
 }
 
 interface ITree extends IMenu {
